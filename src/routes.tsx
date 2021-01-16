@@ -11,6 +11,8 @@ function Routes(){
                 <Route path = "/" exact component = {Main}/>
                 <Route path = "/character/:id" exact component = {Character}/>
                 <Route path = "/starship/:id" exact component = {Starship}/>
+                <Route path = "/vehicle/:id" exact/>
+                <Route path = "/movie/:id" exact/>
             </Switch>
         </BrowserRouter>
     )

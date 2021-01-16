@@ -1,16 +1,14 @@
-import React, { useEffect, useState, FormEvent, ChangeEvent} from 'react'
+import React, { useEffect, useState, FormEvent, ChangeEvent, useCallback} from 'react'
 import Search from '../components/Search'
 import api from '../services/api'
 import {useHistory, Link} from 'react-router-dom'
-import axios from 'axios'
-import { Console } from 'console'
-import { relative } from 'path'
 
 interface Characters{
     name: string,
     films: string[],
     url: string
 }
+
 
 function Main() {
     const [characters, setCharacters] = useState<Characters[]>([]);
@@ -29,12 +27,12 @@ function Main() {
         setInput(e.target.value);
     }
 
-    async function getFilmName(film: string) {
-            const movie = film.split("/");
-            await api.get(`films/${movie[5]}`).then(response =>{
-               return(response.data.title)
-            })
-    }
+    // async function getFilmName(film: string) {
+    //         const movie = film.split("/");
+    //         await api.get(`films/${movie[5]}`).then(response =>{
+    //            return(response.data.title)
+    //         })
+    // }
 
     return (
         <div> 
@@ -50,15 +48,10 @@ function Main() {
                 />
                 <button className = "search-button" onSubmit={handleSubmit}>Procurar</button>
             </form>
-            {characters.map(characters =>{
+            {characters.map(character =>{
                 return (
                     <div>
-                        <Link to={`character/${characters.url.split("/")[5]}`}>{characters.name}</Link>
-                        {characters.films.map((films) =>{
-                            return(
-                                <h5>{(films)}</h5>
-                            )
-                        })}
+                        <Link to={`character/${character.url.split("/")[5]}`}>{character.name}</Link>
                     </div>
                 )
             })}
