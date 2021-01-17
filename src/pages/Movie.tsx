@@ -37,7 +37,6 @@ function Movie() {
             return (api.get(`starships/${nave[5]}`))
            }))
            const naves :StarshipMin[] = []
-           console.log(data[0])
            data.map((nave:any) =>{
             naves.push({
                 name: nave.data.name,
@@ -52,7 +51,6 @@ function Movie() {
             return (api.get(`vehicles/${veiculo[5]}`))
            }))
            const veiculos : VehicleMin[] = []
-           console.log(data[0])
            data.map((veiculo:any) =>{
             veiculos.push({
                 name: veiculo.data.name,

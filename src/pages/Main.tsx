@@ -1,33 +1,47 @@
 import React, {  useState, FormEvent, ChangeEvent, useEffect} from 'react'
 import api from '../services/api'
-import {Link} from 'react-router-dom'
 import {Characters} from '../types/Character'
-import {Button, Grid, Input} from '@material-ui/core'
+import {Button, Grid, Input, Typography} from '@material-ui/core'
 import {SearchRounded, ArrowForwardRounded} from '@material-ui/icons'
 import {useHistory} from 'react-router-dom'
 import styles from '../styles/pages/Main'
 
+interface FavoriteMin{
+    id:string,
+    name:string
+}
+
 function Main() {
-    const [characters, setCharacters] = useState<Characters[]>([]);
+    const [characters, setCharacters] = useState<Characters[]>();
         
     const [input, setInput] = useState<string>('');
-    const [nextPage, setNextPage] = useState<string>("");
-    const [prevPage, setPrevPage] = useState<string>("");
+    const [favorites, setFavorites ] = useState<FavoriteMin[]>()
     const history = useHistory()
 
     async function handleSubmit(event: FormEvent){
-        console.log("clicou")
         event.preventDefault();
         await api.get(`people/?search=${input}`).then(response =>{
             setCharacters(response.data.results)
-            setNextPage(response.data.next)
-            setPrevPage(response.data.prev)
         })
     }
-    
-    async function nextPageEvent(){
-        const response = await api.get(`people/${nextPage.split("/")[5]}`)
-        setCharacters(response.data)
+
+    useEffect(()=>{
+        var listaFavoritos = JSON.parse(localStorage.getItem("@swapi/favorites")|| '[]')
+        getFavorites(listaFavoritos)
+    },[])
+
+    async function getFavorites(favorites: string[]){
+        const data : any = await Promise.all(favorites.map((favorite: string)=>{
+            return (api.get(`people/${favorite}`))
+        }))
+        const fav: FavoriteMin[] = []
+        data.map((favo:any)=>{
+            fav.push({
+                id: favo.data.url.split("/")[5],
+                name: favo.data.name
+            })
+        })
+        setFavorites(fav)
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) =>{
@@ -47,14 +61,33 @@ function Main() {
                 </Grid>
                 <div style ={{height: 20}}/>
                 <Grid container style = {{...styles.body, paddingLeft: '13%'}} xs ={6}>
-                    {characters.map(character =>{
-                        return (
-                        <Grid item direction = "row" style={{...styles.searchContainer, marginTop: 5}}>
-                            <Input value={character.name} onClick= {()=>{alert()}} disabled style= {{...styles.input, width: '60%'}} disableUnderline/>
-                            <Button onClick={()=>history.push(`character/${character.url.split("/")[5]}`)}style = {{backgroundColor: 'black'}} endIcon = {<ArrowForwardRounded color="secondary" fontSize= "large"/>}/>
-                        </Grid>
+                    { characters ? (
+                        characters.map(character =>{
+                            return (
+                            <Grid item direction = "row" style={{...styles.searchContainer, marginTop: 5}}>
+                                <Input value={character.name} disabled style= {{...styles.input, width: '60%'}} disableUnderline/>
+                                <Button onClick={()=>history.push(`character/${character.url.split("/")[5]}`)}style = {{backgroundColor: 'black'}} endIcon = {<ArrowForwardRounded color="secondary" fontSize= "large"/>}/>
+                            </Grid>
+                            )
+                        })
+                    ) : (
+                        favorites ? (
+                            <div style ={{width: '100%'}}>
+                                <Typography style = {styles.favoriteText}> Favoritos </Typography>
+                                {favorites.map(favorite=>{
+                                    return(
+                                        <Grid item direction = "row" style={{...styles.searchContainer, marginTop: 5}}>
+                                            <Input value={favorite.name} disabled style= {{...styles.input, width: '60%'}} disableUnderline/>
+                                            <Button onClick={()=>history.push(`character/${favorite.id}`)}style = {{backgroundColor: 'black'}} endIcon = {<ArrowForwardRounded color="secondary" fontSize= "large"/>}/>
+                                        </Grid>
+                                    )
+                                })}
+                            </div>
+                        ) : (
+                            <div/>
                         )
-                    })}
+                    )
+                    }
                 </Grid>
             </Grid>            
     )

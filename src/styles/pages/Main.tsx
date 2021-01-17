@@ -40,6 +40,10 @@ const styles={
     height: "100%",
     borderRadius: 5,
     paddingLeft: 30,
+  },
+  favoriteText:{
+    color: 'white',
+    paddingLeft: '25%'
   }
 }
 
