@@ -70,10 +70,6 @@ function Main() {
                 </Grid>
                 <div style ={{height: 20}}/>
                 <Grid container style = {{...styles.body, paddingLeft: '13%'}} xs ={6}>
-                    {/* <Grid item direction = "row" style={styles.searchContainer}>
-                        <Input value="ALO CARALHO"  disabled style= {styles.input} disableUnderline/>
-                        <Button style = {{backgroundColor: 'black'}} endIcon = {<ArrowForwardRounded color="secondary" fontSize= "large"/>}></Button>
-                    </Grid> */}
                     {characters.map(character =>{
                         return (
                         <Grid item direction = "row" style={{...styles.searchContainer, marginTop: 5}}>
@@ -84,11 +80,6 @@ function Main() {
                     })}
                 </Grid>
             </Grid>            
-
-            {/* {nextPage ? (
-                <button onClick= {()=>nextPageEvent()}>Proxima</button>
-            ) : (<div></div>)} */}
-
         </ThemeProvider>
     )
 }
