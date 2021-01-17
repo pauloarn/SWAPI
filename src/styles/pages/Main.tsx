@@ -32,6 +32,14 @@ const styles={
       height: "100%", 
       paddingLeft: 30, 
       borderRadius: 5
+  },
+  textResult:{
+    color: 'black',
+    backgroundColor: 'white',
+    width: '90%',
+    height: "100%",
+    borderRadius: 5,
+    paddingLeft: 30,
   }
 }
 

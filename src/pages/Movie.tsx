@@ -6,6 +6,10 @@ import {Movies, MovieParams} from '../types/Movie'
 import {CharacterMin} from '../types/Character'
 import {VehicleMin} from '../types/Vehicle'
 import {StarshipMin} from '../types/Starship'
+import { Grid, ButtonBase, Typography} from '@material-ui/core'
+import styles from '../styles/pages/Details'
+import DetailItem from '../components/DetailItem'
+import BackButton from '../components/BackButton'
 
 function Movie() {
 
@@ -75,45 +79,68 @@ function Movie() {
 
 
     return (
-        <div>
-            <button onClick = {()=> history.goBack()}>Voltar</button>
+        <>
+            <Grid container style={styles.principal}>
+            <Grid item xs = {4} >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+            </Grid>
             {movies ? (
-                <div>
-                    <h1>Título: {movies.title}</h1>
-                    <h3>Numero do Episódio: {movies.episode_id}</h3>
-                    <h3>Sequecia de Abertura: {movies.opening_crawl}</h3>
-                    <h3>Diretor: {movies.director} </h3>
-                    <h3>Produtor: {movies.producer} </h3>
-                    <h3>Data de Lançamento: {movies.release_date} </h3>
-                   {character ? ( <h3>Personagens: {character.map((character) =>{
-                        return(                        
-                            <button onClick = {()=>history.push(`/character/${character.id}`)}>{character.name}</button>
-                        )
-                        })}</h3>) : 
-                        ( <h3>Carregando Personagens...</h3>)
-                    }
-                    {starship ? (
-                    <h3>Naves Espaciais: {starship.map(starship=>{
-                        return(
-                            <button onClick = {()=>history.push(`/starship/${starship.id}`)}>{starship.name}</button>
-                        )
-                    })}</h3>) : (<h3>Carregando Naves...</h3>)}
-                    {vehicles? (
-                    <h3>Veículos: {vehicles.map(vehicle =>{
-                                    return(
-                                        <button onClick = {()=>history.push(`/vehicle/${vehicle.id}`)}>{vehicle.name}</button>
-                                    )
-                                })}</h3>
-
-                    ) : (<h3>Carregando Veiculos...</h3>)
-                    }
-                    </div>
-                ):
-                (
-                    <h1>Carregando Filme...</h1>
-                )
-                }
-        </div>
+            <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+                <Grid item container style ={{justifyContent: 'space-between'}}>
+                    <BackButton/>
+                    <Typography style={styles.title}>{movies.title}</Typography>
+                    <div/>
+                </Grid>
+                <Grid container item style={styles.detailsContainer} direction = "column">      
+                  <DetailItem field = "Episódio: " value = {` ${movies.episode_id}`}/>   
+                  <DetailItem field = "Sequencia de Abertura: " value = {` ${movies.opening_crawl}`}/>   
+                  <DetailItem field = "Diretor: " value = {` ${movies.director}`}/>   
+                  <DetailItem field = "Lançamento: " value = {` ${movies.release_date}`}/>   
+                    <Typography style={styles.detailsTxt}>Personagens: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {character ? (<div>
+                            {character.map((character)=>{
+                                return(
+                                    <ButtonBase onClick= {()=>history.push(`/character/${character.id}`)} style ={styles.buttonMore}>{character.name}</ButtonBase>
+                                )
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Personagens . . .</Typography>
+                        )}
+                    </Grid>
+                    <Typography style={styles.detailsTxt}>Starships: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {starship ? (<div>
+                            {starship.map((starship)=>{
+                                return(
+                                    <ButtonBase onClick= {()=>history.push(`/starship/${starship.id}`)} style ={styles.buttonMore}>{starship.name}</ButtonBase>
+                                )
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Naves . . . </Typography>
+                        )}
+                    </Grid>
+                    <Typography style={styles.detailsTxt}>Veículos: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {vehicles ? (<div>
+                            {vehicles.map((vehicle)=>{
+                                return(
+                                    <ButtonBase onClick= {()=>history.push(`/vehicle/${vehicle.id}`)} style ={{...styles.buttonMore, width: 200}}>{vehicle.name}</ButtonBase>
+                                )
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Espaçonaves . . .</Typography>
+                        )}
+                    </Grid>
+                </Grid>
+            </Grid>
+            ): ( <Typography style={styles.title}>Carregando . . .</Typography>) }
+        </Grid>        
+        <div style={{height: 10, backgroundColor:'black'}}/>
+    </>
     )
 }
 

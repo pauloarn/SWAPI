@@ -1,12 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useParams, useHistory } from 'react-router-dom'
 import api from '../services/api'
-import {useHistory} from 'react-router-dom'
 import {MovieMin} from '../types/Movie'
 import {VehicleMin} from '../types/Vehicle'
 import {StarshipMin} from '../types/Starship'
 import {Characters, CharacterParams} from '../types/Character'
-import {useFavorite} from '../Context/Favorites'
+import { Grid, ButtonBase, Typography, Button} from '@material-ui/core'
+import {StarBorderRounded} from '@material-ui/icons'
+import styles from '../styles/pages/Details'
+import DetailItem from '../components/DetailItem'
+import BackButton from '../components/BackButton'
 
 function Character() {
     const params = useParams<CharacterParams>()
@@ -14,18 +17,28 @@ function Character() {
     const [movies, setMovies] = useState<MovieMin[]>();
     const [starship, setStarship] = useState<StarshipMin[]>();
     const [vehicles, setVehicle] = useState<VehicleMin[]>();
+    const [isFavorite, setIsFavorite] = useState(false);
     const history = useHistory();
     
-    useEffect(()=>{
+    useEffect(()=>{        
         (async ()=>{
            const response=  await api.get(`people/${params.id}`)
             const character = response.data
            setCharacter(character)
            getMovies(character)
-           getVehicle(character)
            getStarship(character)
+           getVehicle(character)
         })()
     },[])
+
+    useEffect(()=>{                      
+        var listaFavoritos = JSON.parse(localStorage.getItem("@swapi/favorites")|| '[]')
+        if(character){
+            if(listaFavoritos.indexOf(`${character.url.split("/")[5]}`)>=0){
+                setIsFavorite(true)
+            }
+        }
+    }, [character])
 
     async function getMovies(character : Characters){
         const data : any = await Promise.all(character.films.map((film:string)=>{
@@ -70,59 +83,82 @@ function Character() {
            setVehicle(veiculos)
     }
 
-    // function newFavorite(){
-    //     const newFavorite = []
-    //     newFavorite.push(
-    //         params.id
-    //     )
-    //     setId([...id, newFavorite])
-    //     alert("Personagem adicionado aos favoritos")
-    //     console.log(id)
-    // }
+    function adicionaFavorito(character: Characters){
+        var listaFavoritos = JSON.parse(localStorage.getItem("@swapi/favorites")|| '[]')
+        if(isFavorite){
+            var index = listaFavoritos.indexOf(`${character.url.split("/")[5]}`)
+            listaFavoritos.splice(index, 1)
+            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))
+            setIsFavorite(false)
+        } else{
+            listaFavoritos.push(`${character.url.split("/")[5]}`)
+            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))
+            setIsFavorite(true)
+        }
+    }
 
     return (
-        <div>
-            <button onClick = {()=> history.goBack()}>Voltar</button>
-            {/* <button onClick = {()=> newFavorite()}>Favoritar</button> */}
-            {character?                 
-            (
-            <div>
-                <h1>Personagem: {character.name}</h1>
-                <h3>Altura: {character.height} cm</h3>
-                <h3>Massa: {character.mass}</h3>
-                <h3>Cor do Cabelo: {character.hair_color}</h3>
-                <h3>Cor da Pele: {character.skin_color}</h3>
-                <h3>Cor do Olho: {character.eye_color}</h3>
-                <h3>Gênero: {character.gender}</h3>
-                {movies ? ( <h3>Filmes: {movies.map((film) =>{
-                    return(                        
-                        <button onClick = {()=>history.push(`/movie/${film.id}`)}>{film.title}</button>
-                    )
-                })}</h3>) : ( <h3>Carregando Filmes...</h3>)}
-                {vehicles? (
-                <h3>Veículos: {vehicles.map(vehicle =>{
+        <Grid container style={styles.principal}>
+            <Grid item xs = {4} >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+            </Grid>
+            {character ? (
+            <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+                <Grid container item style ={{justifyContent: 'space-between'}}>
+                    <BackButton/>
+                    <Typography style={styles.title}>{character.name}</Typography>
+                    <Button onClick = {()=>{adicionaFavorito(character)}} style = {{backgroundColor: 'black'}} endIcon = {<StarBorderRounded color={isFavorite ? ("primary"):("secondary")} fontSize= "large"/>}/>
+                </Grid>
+                <Grid container item style={styles.detailsContainer} direction = "column">                    
+                  <DetailItem field = "Altura: " value = {` ${character.height.toString()} cm`}/>      
+                  <DetailItem field = "Massa: " value = {` ${character.mass}`}/>      
+                  <DetailItem field = "Cor de Cabelo: " value = {` ${character.hair_color}`}/>      
+                  <DetailItem field = "Cor de Pele: " value = {` ${character.skin_color}`}/>      
+                  <DetailItem field = "Cor dos Olhos: " value = {` ${character.eye_color}`}/>                        
+                  <DetailItem field = "Gênero: " value = {` ${character.gender}`}/>
+                    <Typography style={styles.detailsTxt}>Filmes: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {movies ? (<div>
+                            {movies.map((movie)=>{
                                 return(
-                                    <button onClick = {()=>history.push(`/vehicle/${vehicle.id}`)}>{vehicle.name}</button>
+                                    <ButtonBase onClick= {()=>history.push(`/movie/${movie.id}`)} style ={styles.buttonMore}>{movie.title}</ButtonBase>
                                 )
-                            })}</h3>
-
-                ) : (
-                    <h3>Carregando Veiculos...</h3>
-                )
-
-                }
-                {starship ? (
-                <h3>Naves Espaciais: {starship.map(starship=>{
-                    return(
-                        <button onClick = {()=>history.push(`/starship/${starship.id}`)}>{starship.name}</button>
-                    )
-                })}</h3>) : (<h3>Carregando Naves...</h3>)}
-                
-                </div>
-                ) : 
-                (<h4>Carregando...</h4>)                
-            }
-        </div>
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Filmes . . .</Typography>
+                        )}
+                    </Grid>
+                    <Typography style={styles.detailsTxt}>Starships: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {starship ? (<div>
+                            {starship.map((starship)=>{
+                                return(
+                                    <ButtonBase onClick= {()=>history.push(`/starship/${starship.id}`)} style ={styles.buttonMore}>{starship.name}</ButtonBase>
+                                )
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Naves . . . </Typography>
+                        )}
+                    </Grid>
+                    <Typography style={styles.detailsTxt}>Veículos: </Typography>
+                    <Grid container item style={styles.buttonsContainer}>
+                        {vehicles ? (<div>
+                            {vehicles.map((vehicle)=>{
+                                return(
+                                    <ButtonBase onClick= {()=>history.push(`/vehicle/${vehicle.id}`)} style ={styles.buttonMore}>{vehicle.name}</ButtonBase>
+                                )
+                            })}
+                        </div>
+                        ) : (
+                            <Typography style={styles.detailsTxt}>Carregando Veículos . . .</Typography>
+                        )}
+                    </Grid>
+                </Grid>
+            </Grid>
+            ): ( <Typography style={styles.title}>Carregando . . .</Typography>) }
+        </Grid>
     )
 }
 

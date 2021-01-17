@@ -2,21 +2,10 @@ import React, {  useState, FormEvent, ChangeEvent, useEffect} from 'react'
 import api from '../services/api'
 import {Link} from 'react-router-dom'
 import {Characters} from '../types/Character'
-import {Button, Grid, Input, createMuiTheme, ThemeProvider} from '@material-ui/core'
+import {Button, Grid, Input} from '@material-ui/core'
 import {SearchRounded, ArrowForwardRounded} from '@material-ui/icons'
 import {useHistory} from 'react-router-dom'
 import styles from '../styles/pages/Main'
-
-const theme = createMuiTheme({
-    palette: {
-      primary: {
-        main: "#000000"
-      },
-      secondary: {
-        main: "#ffffff"
-      }
-    }
-  });
 
 function Main() {
     const [characters, setCharacters] = useState<Characters[]>([]);
@@ -35,18 +24,7 @@ function Main() {
             setPrevPage(response.data.prev)
         })
     }
-
-    async function searchCharacter(){
-        console.log("clicou")
-    }
-
-    // useEffect(()=>{
-    //     (async ()=>{
-    //         const response = await api.get(`people/${nextPage.split("/")[5]}}`)
-    //         setCharacters(response.data)
-    //      })()
-    // },[characters])
-
+    
     async function nextPageEvent(){
         const response = await api.get(`people/${nextPage.split("/")[5]}`)
         setCharacters(response.data)
@@ -57,7 +35,6 @@ function Main() {
     }
 
     return (
-        <ThemeProvider theme = {theme}>
             <Grid container direction = 'column' style = {styles.principal}>
                 <Grid item xs = {6} >
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:"contain"}}/>
@@ -70,10 +47,6 @@ function Main() {
                 </Grid>
                 <div style ={{height: 20}}/>
                 <Grid container style = {{...styles.body, paddingLeft: '13%'}} xs ={6}>
-                    {/* <Grid item direction = "row" style={styles.searchContainer}>
-                        <Input value="ALO CARALHO"  disabled style= {styles.input} disableUnderline/>
-                        <Button style = {{backgroundColor: 'black'}} endIcon = {<ArrowForwardRounded color="secondary" fontSize= "large"/>}></Button>
-                    </Grid> */}
                     {characters.map(character =>{
                         return (
                         <Grid item direction = "row" style={{...styles.searchContainer, marginTop: 5}}>
@@ -84,12 +57,6 @@ function Main() {
                     })}
                 </Grid>
             </Grid>            
-
-            {/* {nextPage ? (
-                <button onClick= {()=>nextPageEvent()}>Proxima</button>
-            ) : (<div></div>)} */}
-
-        </ThemeProvider>
     )
 }
 

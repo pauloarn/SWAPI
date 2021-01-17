@@ -4,7 +4,11 @@ import api from '../services/api'
 import {useHistory} from 'react-router-dom'
 import {MovieMin} from '../types/Movie'
 import {Vehicles, VehicleParams} from '../types/Vehicle'
+import { Grid, ButtonBase, Typography} from '@material-ui/core'
 import {CharacterMin} from '../types/Character'
+import styles from '../styles/pages/Details'
+import DetailItem from '../components/DetailItem'
+import BackButton from '../components/BackButton'
 
 function Vehicle() {
 
@@ -55,38 +59,58 @@ function Vehicle() {
     }    
 
     return (
-        <div>
-            <button onClick = {()=> history.goBack()}>Voltar</button>
+        <Grid container style={styles.principal}>
+            <Grid item xs = {4} >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+            </Grid>
             {vehicle ? (
-                <div>
-                    <h1>Veiculo: {vehicle.name}</h1>
-                    <h3>Modelo : {vehicle.model}</h3>
-                    <h3>Fabricante: {vehicle.manufacturer} </h3>
-                    <h3>Valor(Créditos: {vehicle.cost_in_credits}</h3>
-                    <h3>Comprimento: {vehicle.length} </h3>
-                    <h3>Velocidade Máxima na Atmosfera: {vehicle.max_atmosphering_speed} </h3>
-                    <h3>Capacidade de Tripulantes: {vehicle.crew} </h3>
-                    <h3>Capacidade de Passageiros: {vehicle.passengers} </h3>
-                    <h3>Capacidade de Carga: {vehicle.cargo_capacity} </h3>
-                    <h3>Consumiveis: {vehicle.consumables} </h3>
-                    <h3>Classe de Veículo: {vehicle.vehicle_class} </h3>
-                   {pilots ? ( <h3>Pilotos: {pilots.map((piloto) =>{
-                        return(                        
-                            <button onClick = {()=>history.push(`/character/${piloto.id}`)}>{piloto.name}</button>
-                        )
-                        })}</h3>) : 
-                        ( <h3>Carregando Pilotos...</h3>)
-                    }
-                    {movies ? ( <h3>Filmes: {movies.map((movie) =>{
-                         return(                        
-                             <button onClick = {()=>history.push(`/movie/${movie.id}`)}>{movie.title}</button>
-                         )
-                         })}</h3>) : 
-                         ( <h3>Carregando Filmes...</h3>)
-                     }
-                </div>
-            ) : (<h1>Carregando...</h1>)}
-        </div>
+            <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+            <Grid item container style ={{justifyContent: 'space-between'}}>                
+                <BackButton/>
+                <Typography style={styles.title}>{vehicle.name}</Typography>
+                <div/>
+            </Grid>
+                <Grid container item style={styles.detailsContainer} direction = "column">   
+									<DetailItem field = "Modelo: " value = {` ${vehicle.model}`}/>
+									<DetailItem field = "Fabricante: " value = {` ${vehicle.manufacturer}`}/>
+									<DetailItem field = "Valor: " value = {` ${vehicle.cost_in_credits} Créditos`}/>
+									<DetailItem field = "Comprimento: " value = {` ${vehicle.length} Metros`}/>
+									<DetailItem field = "Velocidade Máxima (Na Atmosfera):" value = {` ${vehicle.max_atmosphering_speed}`}/>
+									<DetailItem field = "Capacidade de Tripulantes: " value = {` ${vehicle.crew}`}/>
+									<DetailItem field = "Capacidade de Passageiros: " value = {` ${vehicle.passengers}`}/>
+									<DetailItem field = "Capacidade de Carga: " value = {` ${vehicle.cargo_capacity}`}/>
+									<DetailItem field = "Consumiveis: " value = {` ${vehicle.consumables}`}/>
+									<DetailItem field = "Classe de Veículo: " value = {` ${vehicle.vehicle_class}`}/>
+									<Typography style={styles.detailsTxt}>Filmes: </Typography>
+										<Grid container item style={styles.buttonsContainer}>
+												{movies ? (<div>
+														{movies.map((movie)=>{
+																return(
+																		<ButtonBase onClick= {()=>history.push(`/movie/${movie.id}`)} style ={styles.buttonMore}>{movie.title}</ButtonBase>
+																)
+														})}
+												</div>
+												) : (
+														<Typography style={styles.detailsTxt}>Carregando Filmes . . .</Typography>
+												)}
+										</Grid>
+										<Typography style={styles.detailsTxt}>Pilotos: </Typography>
+										<Grid container item style={styles.buttonsContainer}>
+												{pilots ? (<div>
+														{pilots.map((pilot)=>{
+																return(
+																		<ButtonBase onClick= {()=>history.push(`/starship/${pilot.id}`)} style ={styles.buttonMore}>{pilot.name}</ButtonBase>
+																	)
+															})}
+												</div>
+												) : (
+														<Typography style={styles.detailsTxt}>Carregando Pilotos . . . </Typography>
+												)}
+                  </Grid>
+                </Grid>
+            </Grid>
+            ): ( <Typography style={styles.title}>Carregando . . .</Typography>) }
+        </Grid>
     )
 }
 
