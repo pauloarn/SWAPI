@@ -1,47 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../services/api'
-import {useHistory, Link} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
+import {MovieMin} from '../types/Movie'
+import {VehicleMin} from '../types/Vehicle'
+import {StarshipMin} from '../types/Starship'
+import {Characters, CharacterParams} from '../types/Character'
+import {useFavorite} from '../Context/Favorites'
 
-interface Character{
-    name: string,
-    height: number,
-    mass: number,
-    hair_color: string,
-    skin_color: string,
-    eye_color: string,
-    gender: string,
-    films: string[],
-    vehicles: string[],
-    starships: string[],
-    url: string
-}
-
-interface CharacterParams{
-    id:string
-}
-
-interface Movie{
-    id: string,
-    title: string
-}
-
-interface Starship{
-    name: string,
-    id: string
-}
- interface  Vehicles{
-    name: string,
-    id: string
- }
 function Character() {
     const params = useParams<CharacterParams>()
-    const [character, setCharacter] = useState<Character>();
-    const [movies, setMovies] = useState<Movie[]>();
-    const [starship, setStarship] = useState<Starship[]>();
-    const [vehicles, setVehicle] = useState<Vehicles[]>();
+    const [character, setCharacter] = useState<Characters>();
+    const [movies, setMovies] = useState<MovieMin[]>();
+    const [starship, setStarship] = useState<StarshipMin[]>();
+    const [vehicles, setVehicle] = useState<VehicleMin[]>();
     const history = useHistory();
-
+    
     useEffect(()=>{
         (async ()=>{
            const response=  await api.get(`people/${params.id}`)
@@ -53,12 +27,12 @@ function Character() {
         })()
     },[])
 
-    async function getMovies(character : Character){
+    async function getMovies(character : Characters){
         const data : any = await Promise.all(character.films.map((film:string)=>{
             const movie = film.split("/");
             return (api.get(`films/${movie[5]}`))
            }))
-           const filmes :Movie[] = []
+           const filmes :MovieMin[] = []
            data.map((movie:any) =>{
             filmes.push({
                 title: movie.data.title,
@@ -67,13 +41,12 @@ function Character() {
            })
            setMovies(filmes)
     }
-    async function getStarship(character : Character){
+    async function getStarship(character : Characters){
         const data : any = await Promise.all(character.starships.map((starship:string)=>{
             const nave = starship.split("/");
             return (api.get(`starships/${nave[5]}`))
            }))
-           const naves :Starship[] = []
-           console.log(data[0])
+           const naves :StarshipMin[] = []
            data.map((nave:any) =>{
             naves.push({
                 name: nave.data.name,
@@ -82,13 +55,12 @@ function Character() {
            })
            setStarship(naves)
     }
-    async function getVehicle(character : Character){
+    async function getVehicle(character : Characters){
         const data : any = await Promise.all(character.vehicles.map((vehicle:string)=>{
             const veiculo = vehicle.split("/");
             return (api.get(`vehicles/${veiculo[5]}`))
            }))
-           const veiculos : Vehicles[] = []
-           console.log(data[0])
+           const veiculos : VehicleMin[] = []
            data.map((veiculo:any) =>{
             veiculos.push({
                 name: veiculo.data.name,
@@ -98,9 +70,20 @@ function Character() {
            setVehicle(veiculos)
     }
 
+    // function newFavorite(){
+    //     const newFavorite = []
+    //     newFavorite.push(
+    //         params.id
+    //     )
+    //     setId([...id, newFavorite])
+    //     alert("Personagem adicionado aos favoritos")
+    //     console.log(id)
+    // }
+
     return (
         <div>
             <button onClick = {()=> history.goBack()}>Voltar</button>
+            {/* <button onClick = {()=> newFavorite()}>Favoritar</button> */}
             {character?                 
             (
             <div>
@@ -113,7 +96,7 @@ function Character() {
                 <h3>Gênero: {character.gender}</h3>
                 {movies ? ( <h3>Filmes: {movies.map((film) =>{
                     return(                        
-                        <button onClick = {()=>history.push(`/film/${film.id}`)}>{film.title}</button>
+                        <button onClick = {()=>history.push(`/movie/${film.id}`)}>{film.title}</button>
                     )
                 })}</h3>) : ( <h3>Carregando Filmes...</h3>)}
                 {vehicles? (
