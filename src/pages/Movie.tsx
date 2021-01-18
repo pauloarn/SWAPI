@@ -6,10 +6,12 @@ import {Movies, MovieParams} from '../types/Movie'
 import {CharacterMin} from '../types/Character'
 import {VehicleMin} from '../types/Vehicle'
 import {StarshipMin} from '../types/Starship'
-import { Grid, ButtonBase, Typography} from '@material-ui/core'
+import { Grid, ButtonBase, Typography, Button} from '@material-ui/core'
+import {HomeOutlined} from '@material-ui/icons'
 import styles from '../styles/pages/Details'
 import DetailItem from '../components/DetailItem'
 import BackButton from '../components/BackButton'
+import logo from '../images/starwars.png'
 
 function Movie() {
 
@@ -80,10 +82,11 @@ function Movie() {
         <>
             <Grid container style={styles.principal}>
             <Grid item xs = {4} >
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+                <img onClick = {()=>{history.push("/")}} src={logo} style = {{...styles.image, objectFit:"contain"}}/>
             </Grid>
             {movies ? (
-            <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+            <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">                
+                <Button  onClick= {()=>history.push("/")} endIcon = {<HomeOutlined fontSize = "large" color = "secondary"/>}/>
                 <Grid item container style ={{justifyContent: 'space-between'}}>
                     <BackButton/>
                     <Typography style={styles.title}>{movies.title}</Typography>

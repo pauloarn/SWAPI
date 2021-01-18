@@ -5,10 +5,12 @@ import {useHistory} from 'react-router-dom'
 import {Starships, StarshipParams} from '../types/Starship'
 import {MovieMin} from '../types/Movie'
 import {CharacterMin} from '../types/Character'
-import { Grid, ButtonBase, Typography} from '@material-ui/core'
+import { Grid, ButtonBase, Typography, Button} from '@material-ui/core'
+import {HomeOutlined} from '@material-ui/icons'
 import styles from '../styles/pages/Details'
 import DetailItem from '../components/DetailItem'
 import BackButton from '../components/BackButton'
+import logo from '../images/starwars.png'
 
 function Starship() {
     const params = useParams<StarshipParams>();
@@ -21,8 +23,10 @@ function Starship() {
         (async ()=>{
            const response=  await api.get(`starships/${params.id}`)
            const starship = response.data
-           setStarship(starship)       
-           getPilots(starship)    
+           setStarship(starship)                  
+           if(starship.pilots.length > 0){
+            getPilots(starship)    
+           }
            getMovies(starship)
         })()
     },[])
@@ -60,10 +64,11 @@ function Starship() {
     return (
         <Grid container style={styles.principal}>
             <Grid item xs = {4} >
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+                <img onClick = {()=>{history.push("/")}} src={logo} style = {{...styles.image, objectFit:"contain"}}/>
             </Grid>
             {starship ? (
             <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+                <Button  onClick= {()=>history.push("/")} endIcon = {<HomeOutlined fontSize = "large" color = "secondary"/>}/>
                 <Grid item container style ={{justifyContent: 'space-between'}}>
                     <BackButton/>
                     <Typography style={styles.title}>{starship.name}</Typography>
@@ -95,7 +100,7 @@ function Starship() {
                             <Typography style={styles.detailsTxt}>Carregando Filmes . . .</Typography>
                         )}
                     </Grid>
-                    <Typography style={styles.detailsTxt}>Starships: </Typography>
+                    <Typography style={styles.detailsTxt}>Pilotos: </Typography>
                     <Grid container item style={styles.buttonsContainer}>
                         {pilots ? (<div>
                             {pilots.map((pilot)=>{
@@ -105,7 +110,7 @@ function Starship() {
                             })}
                         </div>
                         ) : (
-                            <Typography style={styles.detailsTxt}>Carregando Naves . . . </Typography>
+                            <Typography style={styles.detailsTxt}>Nenhum Piloto </Typography>
                         )}
                     </Grid>
                 </Grid>

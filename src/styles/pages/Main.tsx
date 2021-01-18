@@ -14,11 +14,13 @@ const styles={
   },
   body:{
       width: '60%',
-      height: '200'
   },
   searchContainer:{
       justifyContent:'center', 
-      width:'100%'
+      width:'100%',
+      backgroundColor: 'white',
+      borderRadius: 5,
+      padding: 3
   },
   text:{
       fontColor: "white",
@@ -27,11 +29,9 @@ const styles={
   },
   input:{
       color: 'black',
-      backgroundColor: 'white',
       width: '90%',
       height: "100%", 
-      paddingLeft: 30, 
-      borderRadius: 5
+      paddingLeft: 25, 
   },
   textResult:{
     color: 'black',
@@ -43,8 +43,21 @@ const styles={
   },
   favoriteText:{
     color: 'white',
-    paddingLeft: '25%'
-  }
+    paddingLeft: '45%'
+  },
+  noFavText:{
+    color:'white',
+    paddingLeft: '8%'
+  },
+  resultBtn:{
+    backgroundColor: 'white',
+     width: '100%', 
+     fontSize: 20, 
+     padding: 5, 
+     borderRadius: 5, 
+     justifyContent:'space-between', 
+     paddingLeft: 20, 
+     paddingRight: 20}
 }
 
 export default styles

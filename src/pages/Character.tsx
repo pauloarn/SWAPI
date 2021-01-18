@@ -6,10 +6,12 @@ import {VehicleMin} from '../types/Vehicle'
 import {StarshipMin} from '../types/Starship'
 import {Characters, CharacterParams} from '../types/Character'
 import { Grid, ButtonBase, Typography, Button} from '@material-ui/core'
-import {StarBorderRounded} from '@material-ui/icons'
+import {StarBorderRounded, Star, HomeOutlined} from '@material-ui/icons'
+import { ToastContainer, toast } from 'react-toastify';
 import styles from '../styles/pages/Details'
 import DetailItem from '../components/DetailItem'
 import BackButton from '../components/BackButton'
+import logo from '../images/starwars.png'
 
 function Character() {
     const params = useParams<CharacterParams>()
@@ -26,8 +28,12 @@ function Character() {
             const character = response.data
            setCharacter(character)
            getMovies(character)
-           getStarship(character)
-           getVehicle(character)
+           if(character.starships.length > 0){               
+                getStarship(character)
+           }
+           if(character.vehicles.length > 0){
+                getVehicle(character)   
+           }
         })()
     },[])
 
@@ -58,15 +64,15 @@ function Character() {
         const data : any = await Promise.all(character.starships.map((starship:string)=>{
             const nave = starship.split("/");
             return (api.get(`starships/${nave[5]}`))
-           }))
-           const naves :StarshipMin[] = []
-           data.map((nave:any) =>{
+           }))       
+            const naves :StarshipMin[] = []
+            data.map((nave:any) =>{
             naves.push({
                 name: nave.data.name,
                 id: nave.data.url.split("/")[5]
             })
-           })
-           setStarship(naves)
+            })
+            setStarship(naves)     
     }
     async function getVehicle(character : Characters){
         const data : any = await Promise.all(character.vehicles.map((vehicle:string)=>{
@@ -88,11 +94,13 @@ function Character() {
         if(isFavorite){
             var index = listaFavoritos.indexOf(`${character.url.split("/")[5]}`)
             listaFavoritos.splice(index, 1)
-            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))
+            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))            
+            toast("Removido dos Favoritos")
             setIsFavorite(false)
         } else{
             listaFavoritos.push(`${character.url.split("/")[5]}`)
-            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))
+            localStorage.setItem("@swapi/favorites", JSON.stringify(listaFavoritos))            
+            toast("Adicionado aos Favoritos")
             setIsFavorite(true)
         }
     }
@@ -100,14 +108,15 @@ function Character() {
     return (
         <Grid container style={styles.principal}>
             <Grid item xs = {4} >
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png" style = {{...styles.image, objectFit:'contain'}}/>
+                <img onClick = {()=>{history.push("/")}} src={logo} style = {{...styles.image, objectFit:"contain"}}/>
             </Grid>
             {character ? (
             <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+                <Button  onClick= {()=>history.push("/")} endIcon = {<HomeOutlined fontSize = "large" color = "secondary"/>}/>
                 <Grid container item style ={{justifyContent: 'space-between'}}>
                     <BackButton/>
                     <Typography style={styles.title}>{character.name}</Typography>
-                    <Button onClick = {()=>{adicionaFavorito(character)}} style = {{backgroundColor: 'black'}} endIcon = {<StarBorderRounded color={isFavorite ? ("primary"):("secondary")} fontSize= "large"/>}/>
+                    <Button onClick = {()=>{adicionaFavorito(character)}} style = {{backgroundColor: 'black'}} endIcon = {isFavorite ? (<Star color= "primary" fontSize= "large"/>) : (<StarBorderRounded color="secondary" fontSize= "large"/>)}/>
                 </Grid>
                 <Grid container item style={styles.detailsContainer} direction = "column">                    
                   <DetailItem field = "Altura: " value = {` ${character.height.toString()} cm`}/>      
@@ -139,7 +148,7 @@ function Character() {
                             })}
                         </div>
                         ) : (
-                            <Typography style={styles.detailsTxt}>Carregando Naves . . . </Typography>
+                            <Typography style={styles.detailsTxt}>Não possui Naves</Typography>
                         )}
                     </Grid>
                     <Typography style={styles.detailsTxt}>Veículos: </Typography>
@@ -152,12 +161,18 @@ function Character() {
                             })}
                         </div>
                         ) : (
-                            <Typography style={styles.detailsTxt}>Carregando Veículos . . .</Typography>
+                            <Typography style={styles.detailsTxt}>Não possui Veículos </Typography>
                         )}
                     </Grid>
                 </Grid>
             </Grid>
-            ): ( <Typography style={styles.title}>Carregando . . .</Typography>) }
+            ): (                 
+                <Grid container item xs={12} sm={6} style={{width: '100%'}} alignItems="center" direction = "column" justify = "center">
+                    <Typography style={styles.title}>Carregando . . .</Typography>
+                </Grid>
+            )}
+            
+        <ToastContainer hideProgressBar={true}  limit = {1} autoClose = {2000} position = "top-left"/>
         </Grid>
     )
 }
